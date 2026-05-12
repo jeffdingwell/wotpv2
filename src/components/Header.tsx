@@ -24,7 +24,7 @@ export default function Header({ onAddNew, onSearch, user }: HeaderProps) {
 
   const navItems = [
     {
-      label: 'Add new',
+      label: 'Add new card',
       icon: <Plus size={18} />,
       onClick: () => { onAddNew(); setIsMenuOpen(false); },
       show: !!user
@@ -60,7 +60,7 @@ export default function Header({ onAddNew, onSearch, user }: HeaderProps) {
                 className="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors"
               >
                 <Plus size={18} />
-                <span className="hidden sm:inline">Add new</span>
+                <span className="hidden sm:inline">Add new card</span>
               </button>
               
               <div className="w-[1px] h-6 bg-[#555555]" aria-hidden="true" />
