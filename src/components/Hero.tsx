@@ -1,0 +1,158 @@
+import { Youtube, Music, Play, MessageSquare } from 'lucide-react';
+import { Lyric } from '../types';
+import { motion, AnimatePresence } from 'motion/react';
+
+interface HeroProps {
+  lyric: Lyric | null;
+  isFadingOut?: boolean;
+  onEdit?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  onShowComments: () => void;
+  commentCount: number;
+}
+
+export default function Hero({ lyric, isFadingOut, onEdit, onMouseEnter, onMouseLeave, onShowComments, commentCount }: HeroProps) {
+  if (!lyric) return null;
+
+  const isJeffsCard = lyric.band?.trim().toLowerCase() === 'jeff dingwell';
+
+  return (
+    <div className="relative flex items-center justify-center min-h-screen w-full overflow-hidden">
+      {/* Background with overlay */}
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={`bg-${lyric.id}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6 }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${lyric.imageUrl})` }}
+        >
+          <div className="absolute inset-0 bg-black/30" />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Lyric Card */}
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={`card-${lyric.id}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: isFadingOut ? 0 : 1, 
+            y: isFadingOut ? -20 : 0,
+          }}
+          exit={{ 
+            opacity: 0, 
+            y: -20,
+            transition: { duration: 0.4, ease: "easeIn" }
+          }}
+          transition={{ 
+            duration: 0.8, 
+            ease: [0.21, 0.45, 0.32, 0.9] 
+          }}
+          className="relative z-10 w-full max-w-xl mx-4 -translate-y-[100px] min-[480px]:translate-y-0"
+        >
+          <div 
+            role="button"
+            tabIndex={0}
+            onClick={onEdit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onEdit?.();
+              }
+            }}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            className="w-full bg-black/60 backdrop-blur-sm p-4 min-[480px]:p-12 text-center md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 cursor-pointer group"
+          >
+            <blockquote className={`${isJeffsCard ? 'space-y-4 min-[480px]:space-y-6' : 'space-y-1 min-[480px]:space-y-2'} mb-6 min-[480px]:mb-10`}>
+              {lyric.text.split('\n').map((line, i) => (
+                <p 
+                  key={i}
+                  className={`${
+                    isJeffsCard 
+                      ? 'text-[14px] min-[480px]:text-[18px] md:text-[22.5px] leading-[28.5px]' 
+                      : 'text-[19px] min-[480px]:text-2xl md:text-3xl leading-tight'
+                  } font-serif text-gray-100`}
+                >
+                  {line}
+                </p>
+              ))}
+            </blockquote>
+            
+            <div className="mb-4">
+              {!isJeffsCard && (
+                <h2 className="text-[11px] min-[480px]:text-sm font-semibold tracking-[0.2em] text-white uppercase mb-1">
+                  {lyric.song}
+                </h2>
+              )}
+              <p className="text-[12.5px] min-[480px]:text-[15px] text-gray-400 tracking-wider mb-2">
+                {lyric.band}
+              </p>
+            </div>
+
+            {!isJeffsCard && (
+              <div className="flex items-center justify-between space-x-6 mt-4 pt-4 border-t border-white/10">
+                <div className="flex items-center space-x-6">
+                  {lyric.youtubeUrl && (
+                    <a 
+                      href={lyric.youtubeUrl} 
+                      target="_blank" 
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-white hover:text-red-500 transition-colors"
+                      title="Watch on YouTube"
+                    >
+                      <Youtube size={24} />
+                    </a>
+                  )}
+                  {lyric.spotifyUrl && (
+                    <a 
+                      href={lyric.spotifyUrl} 
+                      target="_blank" 
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-white hover:text-green-500 transition-colors"
+                      title="Listen on Spotify"
+                    >
+                      <Music size={24} />
+                    </a>
+                  )}
+                  {lyric.appleMusicUrl && (
+                    <a 
+                      href={lyric.appleMusicUrl} 
+                      target="_blank" 
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-white hover:text-pink-500 transition-colors"
+                      title="Listen on Apple Music"
+                    >
+                      <Play size={24} />
+                    </a>
+                  )}
+                </div>
+
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onShowComments();
+                  }}
+                  className="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors relative"
+                >
+                  <MessageSquare size={18} />
+                  <span className="hidden min-[480px]:inline">Comments</span>
+                  <span className="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold min-w-[18px] text-center">
+                    {commentCount}
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}

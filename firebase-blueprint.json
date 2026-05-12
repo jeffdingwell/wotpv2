@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "lyric": {
+      "title": "Lyric",
+      "description": "A featured lyric snippet with song details.",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string", "description": "The lyric text." },
+        "song": { "type": "string", "description": "Song title." },
+        "band": { "type": "string", "description": "Band name." },
+        "imageUrl": { "type": "string", "description": "Background image URL." },
+        "userId": { "type": "string", "description": "User ID of the creator." },
+        "userName": { "type": "string", "description": "Display name of the creator." },
+        "youtubeUrl": { "type": "string", "description": "Link to YouTube." },
+        "spotifyUrl": { "type": "string", "description": "Link to Spotify." },
+        "appleMusicUrl": { "type": "string", "description": "Link to Apple Music." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["text", "song", "band", "imageUrl"]
+    },
+    "comment": {
+      "title": "Comment",
+      "description": "User message in the community section.",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string", "description": "The message body." },
+        "lyricId": { "type": "string", "description": "The ID of the board this comment belongs to." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["text", "lyricId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "lyrics": {
+      "schema": "lyric",
+      "description": "Collection of lyrics shown on the main screen."
+    },
+    "comments": {
+      "schema": "comment",
+      "description": "Community comments."
+    }
+  }
+}

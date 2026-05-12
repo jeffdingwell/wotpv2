@@ -1,0 +1,109 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Phase 3: Primitive Definitions ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      // Identity check for bootstrapped admin
+      return isEmailVerified() && request.auth.token.email == 'jeff@bolddesign.ca';
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Lyrics Collection ---
+    match /lyrics/{lyricId} {
+      // Pillar 3: Path Variable Hardening (ID Poisoning Guard)
+      // Pillar 8: Secure List Queries (Enforce structure if public)
+      allow get: if isValidId(lyricId);
+      allow list: if true;
+      
+      // Pillar 1: Relational Sync & Identity
+      allow create: if isEmailVerified() 
+        && isValidLyric(incoming())
+        && incoming().userId == request.auth.uid
+        && incoming().createdAt == request.time
+        // Prevent Shadow fields
+        && incoming().keys().size() >= 7 && incoming().keys().size() <= 10;
+
+      // Pillar 4: Tiered Identity Logic
+      allow update: if isEmailVerified() 
+        && isValidLyric(incoming())
+        && (
+          isAdmin() || (
+            existing().userId == request.auth.uid 
+            && incoming().userId == existing().userId
+            && incoming().createdAt == existing().createdAt
+            && incoming().updatedAt == request.time
+            // Action: Edit Content
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'text', 'song', 'band', 'imageUrl', 'youtubeUrl', 'spotifyUrl', 'appleMusicUrl', 'userName', 'updatedAt'
+            ])
+          )
+        );
+
+      allow delete: if isEmailVerified() && (isAdmin() || existing().userId == request.auth.uid);
+    }
+
+    function isValidLyric(data) {
+      return data.keys().hasAll(['text', 'song', 'band', 'imageUrl', 'userId', 'userName', 'createdAt'])
+        && data.text is string && data.text.size() > 0 && data.text.size() <= 5000
+        && data.song is string && data.song.size() > 0 && data.song.size() <= 200
+        && data.band is string && data.band.size() > 0 && data.band.size() <= 200
+        && data.imageUrl is string && data.imageUrl.size() <= 2000 && data.imageUrl.matches('^https?://.*')
+        && data.userId is string && data.userId.size() <= 128
+        && data.userName is string && data.userName.size() <= 100
+        && data.get('youtubeUrl', '') is string && data.get('youtubeUrl', '').size() <= 1000
+        && data.get('spotifyUrl', '') is string && data.get('spotifyUrl', '').size() <= 1000
+        && data.get('appleMusicUrl', '') is string && data.get('appleMusicUrl', '').size() <= 1000;
+    }
+
+    // --- Comments Collection ---
+    match /comments/{commentId} {
+      // Pillar 3: Path Variable Hardening
+      allow get: if isValidId(commentId);
+      allow list: if isValidId(resource.data.lyricId);
+
+      allow create: if isEmailVerified()
+        && isValidComment(incoming())
+        && incoming().userId == request.auth.uid
+        && incoming().createdAt == request.time
+        && exists(/databases/$(database)/documents/lyrics/$(incoming().lyricId))
+        && incoming().keys().size() == 5;
+
+      allow delete: if isEmailVerified() && (isAdmin() || existing().userId == request.auth.uid);
+      
+      // Comments are immutable in this app
+      allow update: if false;
+    }
+
+    function isValidComment(data) {
+      return data.keys().hasAll(['text', 'userId', 'userName', 'lyricId', 'createdAt'])
+        && data.text is string && data.text.size() > 0 && data.text.size() <= 1000
+        && data.userName is string && data.userName.size() > 0 && data.userName.size() <= 100
+        && isValidId(data.lyricId);
+    }
+  }
+}
