@@ -82,9 +82,16 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
               return;
             }
           }
+        } else {
+          try {
+            const errorData = await res.json();
+            if (errorData.error) throw new Error(errorData.error);
+          } catch (e: any) {
+            if (e.message) throw e;
+          }
         }
         
-        throw new Error('Pexels API key missing or proxy failed. Please set VITE_PEXELS_API_KEY for production.');
+        throw new Error('Pexels API key missing or proxy failed. Please set PEXELS_API_KEY in your project secrets.');
       }
     } catch (error: any) {
       console.error('Failed to search pexels:', error);
@@ -151,7 +158,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
     }
   };
 
-  const baseInputClasses = "w-full border-b border-gray-300 focus:border-blue-600 outline-none transition-colors text-sm placeholder:text-gray-300";
+  const baseInputClasses = "w-full border-b border-gray-300 focus:border-blue-600 outline-none transition-colors text-base placeholder:text-gray-300";
   const singleLineClasses = `${baseInputClasses} h-8`;
   const labelClasses = "block text-[11px] uppercase tracking-widest text-gray-500 font-medium mb-1";
 
@@ -232,7 +239,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
                 value={pexelsQuery}
                 onChange={(e) => setPexelsQuery(e.target.value)}
                 placeholder="Describe your background then press search"
-                className="flex-1 h-8 outline-none text-sm placeholder:text-gray-300"
+                className="flex-1 h-8 outline-none text-base placeholder:text-gray-300"
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleSearchImages())}
               />
               <button 
