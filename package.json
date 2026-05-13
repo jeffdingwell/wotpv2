@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit && eslint ."
+    "lint": "tsc --noEmit && eslint .",
+    "prefbh": "git pull && npm run build",
+    "fbh": "firebase deploy --only hosting"
   },
   "dependencies": {
     "@firebase/eslint-plugin-security-rules": "^0.0.2",
