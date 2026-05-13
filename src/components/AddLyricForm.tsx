@@ -80,7 +80,20 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
       }
     } catch (error: any) {
       console.error('Failed to search pexels:', error);
-      setSearchError(error?.message || 'Failed to search images');
+      
+      // If we got a non-JSON response, try to peek at it for debugging
+      if (error.message === 'Server returned non-JSON response') {
+        try {
+          const debugRes = await fetch(`/api/pexels/search?query=${encodeURIComponent(pexelsQuery)}&page=${page}`);
+          const text = await debugRes.text();
+          console.error('Non-JSON response body (start):', text.substring(0, 200));
+          setSearchError(`Server error (non-JSON): ${text.substring(0, 100)}...`);
+        } catch (e) {
+          setSearchError('Server returned non-JSON response and failed to read body');
+        }
+      } else {
+        setSearchError(error?.message || 'Failed to search images');
+      }
     } finally {
       setIsSearching(false);
     }

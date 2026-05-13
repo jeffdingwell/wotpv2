@@ -12,27 +12,36 @@ async function startServer() {
 
   app.use(express.json());
 
+  // API Router
+  const apiRouter = express.Router();
+
+  // Logging and Content-Type header for all API routes
+  apiRouter.use((req, res, next) => {
+    console.log(`[API Request] ${req.method} ${req.originalUrl || req.url}`);
+    res.setHeader('Content-Type', 'application/json');
+    next();
+  });
+
   // API Route for Pexels Search
-  app.get('/api/pexels/search', async (req, res) => {
+  apiRouter.get('/pexels/search', async (req, res) => {
     const query = req.query.query as string;
     const page = parseInt(req.query.page as string) || 1;
+
     if (!query) {
       return res.status(400).json({ error: 'Query parameter is required' });
     }
 
-    // Try both standard and Vite-prefixed keys for flexibility, with a hardcoded fallback as requested.
-    // We filter out placeholders like "YOUR_PEXELS_API_KEY"
     const candidates = [
       process.env.PEXELS_API_KEY,
       process.env.VITE_PEXELS_API_KEY,
-      'HakLnJ24mzkfPjZtUj1Xp0yQa5YTitIGAV5IfkmgO6TtPMgX5lwBMfAc' // Hardcoded fallback provided by user
+      'HakLnJ24mzkfPjZtUj1Xp0yQa5YTitIGAV5IfkmgO6TtPMgX5lwBMfAc'
     ];
     
     const apiKey = candidates.find(key => key && key !== 'YOUR_PEXELS_API_KEY');
 
     try {
       if (!apiKey) {
-        return res.status(500).json({ error: 'Pexels API key not configured on server. Please ensure PEXELS_API_KEY is set in project secrets.' });
+        return res.status(500).json({ error: 'Pexels API key not configured on server' });
       }
       
       const client = createClient(apiKey);
@@ -45,10 +54,17 @@ async function startServer() {
       res.json(response);
     } catch (error: any) {
       console.error('Pexels API error:', error);
-      const message = error.message || 'Failed to fetch images from Pexels';
-      res.status(500).json({ error: message });
+      res.status(500).json({ error: error.message || 'Failed to fetch images from Pexels' });
     }
   });
+
+  // Catch-all 404 for API routes to prevent falling through to the SPA fallback (index.html)
+  apiRouter.use((req, res) => {
+    res.status(404).json({ error: `API endpoint not found: ${req.originalUrl || req.url}` });
+  });
+
+  // Mount the API router
+  app.use('/api', apiRouter);
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
