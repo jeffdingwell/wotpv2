@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Loader2, Check, Trash2, ShieldAlert } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Search, Loader2, Check, Trash2, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Lyric } from '../types';
 import { User } from 'firebase/auth';
@@ -275,13 +276,31 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
                   </button>
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={() => handleSearchImages(pexelsPage + 1)}
-                className="text-[10px] text-blue-600 hover:text-blue-800 uppercase tracking-wider font-semibold transition-colors"
-              >
-                Find more images
-              </button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  {pexelsPage > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleSearchImages(pexelsPage - 1)}
+                      disabled={isSearching}
+                      className="text-[10px] text-blue-600 hover:text-blue-800 uppercase tracking-wider font-semibold transition-colors flex items-center"
+                    >
+                      <ChevronLeft size={12} className="mr-1" />
+                      Back
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleSearchImages(pexelsPage + 1)}
+                    disabled={isSearching}
+                    className="text-[10px] text-blue-600 hover:text-blue-800 uppercase tracking-wider font-semibold transition-colors flex items-center"
+                  >
+                    {pexelsPage > 1 ? 'Next' : 'Find more images'}
+                    <ChevronRight size={12} className="ml-1" />
+                  </button>
+                </div>
+                <span className="text-[10px] text-gray-400 font-medium">Page {pexelsPage}</span>
+              </div>
             </div>
           )}
 
@@ -362,14 +381,15 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
         </div>
       </form>
 
-      {/* Global Preview Overlay */}
-      <AnimatePresence>
-        {hoveredImage && (
+      {/* Global Preview Overlay - Positioned 16px left of the side sheet on desktop */}
+      {hoveredImage && createPortal(
+        <AnimatePresence mode="wait">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, x: '-50%', y: '-50%' }}
-            animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
-            exit={{ opacity: 0, scale: 0.9, x: '-50%', y: '-50%' }}
-            className="fixed top-1/2 left-1/2 z-[100] pointer-events-none"
+            key={hoveredImage}
+            initial={{ opacity: 0, scale: 0.9, x: 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.9, x: 20 }}
+            className="fixed top-1/2 right-[464px] -translate-y-1/2 z-[9999] pointer-events-none hidden lg:block"
             style={{ width: '500px' }}
           >
             <div className="bg-black/80 backdrop-blur-md p-2 rounded-lg shadow-2xl overflow-hidden border border-white/10">
@@ -380,8 +400,27 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
               />
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+
+          {/* Mobile version - centered */}
+          <motion.div
+            key={`mobile-${hoveredImage}`}
+            initial={{ opacity: 0, scale: 0.9, x: '-50%', y: '-50%' }}
+            animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
+            exit={{ opacity: 0, scale: 0.9, x: '-50%', y: '-50%' }}
+            className="fixed top-1/2 left-1/2 z-[9999] pointer-events-none lg:hidden"
+            style={{ width: 'min(400px, 80vw)' }}
+          >
+            <div className="bg-black/80 backdrop-blur-md p-2 rounded-lg shadow-2xl overflow-hidden border border-white/10">
+              <img 
+                src={hoveredImage} 
+                alt="Preview" 
+                className="w-full h-auto rounded"
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }

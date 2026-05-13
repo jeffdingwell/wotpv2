@@ -6,13 +6,14 @@ interface HeroProps {
   lyric: Lyric | null;
   isFadingOut?: boolean;
   onEdit?: () => void;
+  canEdit?: boolean;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   onShowComments: () => void;
   commentCount: number;
 }
 
-export default function Hero({ lyric, isFadingOut, onEdit, onMouseEnter, onMouseLeave, onShowComments, commentCount }: HeroProps) {
+export default function Hero({ lyric, isFadingOut, onEdit, canEdit, onMouseEnter, onMouseLeave, onShowComments, commentCount }: HeroProps) {
   if (!lyric) return null;
 
   const isJeffsCard = lyric.band?.trim().toLowerCase() === 'jeff dingwell';
@@ -55,18 +56,9 @@ export default function Hero({ lyric, isFadingOut, onEdit, onMouseEnter, onMouse
           className="relative z-10 w-full max-w-xl mx-4 -translate-y-[100px] min-[480px]:translate-y-0"
         >
           <div 
-            role="button"
-            tabIndex={0}
-            onClick={onEdit}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onEdit?.();
-              }
-            }}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            className="w-full bg-black/60 backdrop-blur-sm p-4 min-[480px]:p-12 text-center md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 cursor-pointer group"
+            className="w-full bg-black/60 backdrop-blur-sm p-4 min-[480px]:p-12 text-center md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 group"
           >
             <blockquote className={`${isJeffsCard ? 'space-y-4 min-[480px]:space-y-6' : 'space-y-1 min-[480px]:space-y-2'} mb-6 min-[480px]:mb-10`}>
               {lyric.text.split('\n').map((line, i) => (
@@ -90,7 +82,7 @@ export default function Hero({ lyric, isFadingOut, onEdit, onMouseEnter, onMouse
                 </h2>
               )}
               <p className="text-[12.5px] min-[480px]:text-[15px] text-gray-400 tracking-wider mb-2">
-                {lyric.band}
+                {isJeffsCard ? 'Enjoy' : lyric.band}
               </p>
             </div>
 
@@ -102,7 +94,6 @@ export default function Hero({ lyric, isFadingOut, onEdit, onMouseEnter, onMouse
                       href={lyric.youtubeUrl} 
                       target="_blank" 
                       rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
                       className="text-white hover:text-red-500 transition-colors"
                       title="Watch on YouTube"
                     >
@@ -114,7 +105,6 @@ export default function Hero({ lyric, isFadingOut, onEdit, onMouseEnter, onMouse
                       href={lyric.spotifyUrl} 
                       target="_blank" 
                       rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
                       className="text-white hover:text-green-500 transition-colors"
                       title="Listen on Spotify"
                     >
@@ -126,7 +116,6 @@ export default function Hero({ lyric, isFadingOut, onEdit, onMouseEnter, onMouse
                       href={lyric.appleMusicUrl} 
                       target="_blank" 
                       rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
                       className="text-white hover:text-pink-500 transition-colors"
                       title="Listen on Apple Music"
                     >
@@ -135,19 +124,26 @@ export default function Hero({ lyric, isFadingOut, onEdit, onMouseEnter, onMouse
                   )}
                 </div>
 
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onShowComments();
-                  }}
-                  className="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors relative"
-                >
-                  <MessageSquare size={18} />
-                  <span className="hidden min-[480px]:inline">Comments</span>
-                  <span className="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold min-w-[18px] text-center">
-                    {commentCount}
-                  </span>
-                </button>
+                <div className="flex items-center">
+                  {canEdit && onEdit && (
+                    <button 
+                      onClick={onEdit}
+                      className="text-sm text-gray-400 hover:text-white transition-colors mr-[16px]"
+                    >
+                      Edit
+                    </button>
+                  )}
+                  <button 
+                    onClick={onShowComments}
+                    className="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors relative"
+                  >
+                    <MessageSquare size={18} />
+                    <span className="hidden min-[480px]:inline">Comments</span>
+                    <span className="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold min-w-[18px] text-center">
+                      {commentCount}
+                    </span>
+                  </button>
+                </div>
               </div>
             )}
           </div>

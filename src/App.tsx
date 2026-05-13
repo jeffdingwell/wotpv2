@@ -261,7 +261,8 @@ export default function App() {
   };
 
   const isAdmin = user?.email === 'jeff@bolddesign.ca';
-  const canEditCurrent = isAdmin || (currentLyric?.id !== 'default' && currentLyric?.userId === user?.uid);
+  const isOwner = currentLyric?.id !== 'default' && currentLyric?.userId === user?.uid;
+  const canEditCurrent = isOwner;
 
   return (
     <div className="min-h-screen bg-black overflow-hidden font-sans">
@@ -290,13 +291,10 @@ export default function App() {
         <Hero 
           lyric={currentLyric} 
           isFadingOut={isFadingOut}
+          canEdit={canEditCurrent}
           onEdit={() => {
-            if (canEditCurrent) {
-              setIsEditing(true);
-              setActivePanel('add-lyric');
-            } else {
-              console.log("No permission to edit this lyric");
-            }
+            setIsEditing(true);
+            setActivePanel('add-lyric');
           }}
           onMouseEnter={() => setIsHoveringHero(true)}
           onMouseLeave={() => setIsHoveringHero(false)}
