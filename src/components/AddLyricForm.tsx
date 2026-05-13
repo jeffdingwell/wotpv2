@@ -53,42 +53,35 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
       const apiKey = import.meta.env.VITE_PEXELS_API_KEY;
       
       if (apiKey && apiKey !== 'YOUR_PEXELS_API_KEY') {
-        // Direct call to Pexels API for static hosting
         const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(pexelsQuery)}&per_page=8&page=${page}`, {
           headers: {
             Authorization: apiKey
           }
         });
         
-        if (!res.ok) {
-          throw new Error(`Pexels API responded with status: ${res.status}`);
-        }
-
+        if (!res.ok) throw new Error(`Pexels API responded with status: ${res.status}`);
         const data = await res.json();
         if (data.photos) {
           setPexelsResults(data.photos);
           setPexelsPage(page);
         }
       } else {
-        // Only try the local API if we're not on a static hosting environment that redirects 404s to index.html
-        // In most static setups, /api/.. will return <!doctype html>... causing the JSON error
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        // Always try the proxy as a fallback
+        const res = await fetch(`/api/pexels/search?query=${encodeURIComponent(pexelsQuery)}&page=${page}`);
         
-        if (isLocalhost || window.location.hostname.includes('ais-dev-') || window.location.hostname.includes('ais-pre-')) {
-          const res = await fetch(`/api/pexels/search?query=${encodeURIComponent(pexelsQuery)}&page=${page}`);
-          
-          if (res.headers.get('content-type')?.includes('text/html')) {
-            throw new Error('API route returned HTML. This usually means the server-side API is missing (common on static hosting). Please provide VITE_PEXELS_API_KEY.');
+        if (res.ok) {
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await res.json();
+            if (data.photos) {
+              setPexelsResults(data.photos);
+              setPexelsPage(page);
+              return;
+            }
           }
-
-          const data = await res.json();
-          if (data.photos) {
-            setPexelsResults(data.photos);
-            setPexelsPage(page);
-          }
-        } else {
-          throw new Error('Pexels API key missing. Please set VITE_PEXELS_API_KEY in your environment for production deployments.');
         }
+        
+        throw new Error('Pexels API key missing or proxy failed. Please set VITE_PEXELS_API_KEY for production.');
       }
     } catch (error) {
       console.error('Failed to search pexels:', error);

@@ -19,7 +19,7 @@ export default function Hero({ lyric, isFadingOut, onEdit, canEdit, onMouseEnter
   const isJeffsCard = lyric.band?.trim().toLowerCase() === 'jeff dingwell';
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen w-full overflow-hidden">
+    <div className="relative flex items-center justify-center h-screen w-full overflow-hidden">
       {/* Background with overlay */}
       <AnimatePresence mode="wait">
         <motion.div 

@@ -265,7 +265,7 @@ export default function App() {
   const canEditCurrent = isOwner;
 
   return (
-    <div className="min-h-screen bg-black overflow-hidden font-sans">
+    <div className="h-screen bg-black overflow-hidden font-sans">
       <Header 
         user={user}
         onAddNew={() => {

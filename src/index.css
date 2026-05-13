@@ -6,6 +6,12 @@
   --font-serif: "PT Serif", serif;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 body {
   @apply font-sans bg-black text-white;
 }
