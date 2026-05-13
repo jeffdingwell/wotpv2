@@ -29,7 +29,7 @@ export default function SidePanel({ isOpen, onClose, title, children }: SidePane
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-white text-black z-[70] shadow-2xl flex flex-col"
+            className="fixed top-0 right-0 h-full w-full max-w-md bg-[#f7f7f7] text-black z-[70] shadow-2xl flex flex-col"
           >
             <div className="flex items-center justify-between px-8 pt-6 pb-4 border-b border-[#E8E8E8]">
               <h2 className="text-2xl font-light tracking-tight text-gray-900">{title}</h2>
@@ -41,7 +41,7 @@ export default function SidePanel({ isOpen, onClose, title, children }: SidePane
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 overflow-y-auto">
               {children}
             </div>
           </motion.div>

@@ -329,59 +329,60 @@ export default function App() {
         onClose={() => setActivePanel(null)}
         title="Search"
       >
-        <div className="px-8 py-6 h-full flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
-            {Object.entries(
-              allLyrics
-                .filter(l => isAdmin || l.band?.trim().toLowerCase() !== 'jeff dingwell')
-                .reduce((acc: Record<string, Lyric[]>, lyric) => {
-                  const band = lyric.band?.trim() || 'Unknown Artist';
-                  if (!acc[band]) acc[band] = [];
-                  acc[band].push(lyric);
-                  return acc;
-                }, {})
-            ).sort(([a], [b]) => a.localeCompare(b)).map(([band, bandLyrics]) => (
-              <div key={band} className="mb-6">
-                <h3 className="text-[16px] font-medium text-gray-900 mb-2">{band}</h3>
-                <div className="pl-[12px]">
-                  {(bandLyrics as Lyric[]).sort((a, b) => a.song.localeCompare(b.song)).map((lyric) => (
-                    <div key={lyric.id} className="flex items-center group border-b border-gray-50 last:border-0">
-                      <div className="flex items-center space-x-2 flex-1 min-w-0 py-2">
-                        {isAdmin && lyric.id !== 'default' && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setLyricToDelete(lyric.id);
-                            }}
-                            className="text-gray-300 hover:text-red-500 transition-colors p-1 -ml-1"
-                            title="Delete lyric"
-                          >
-                            <X size={12} />
-                          </button>
-                        )}
+        <div className="px-8 py-6 bg-white min-h-full">
+          {Object.entries(
+            allLyrics
+              .filter(l => isAdmin || l.band?.trim().toLowerCase() !== 'jeff dingwell')
+              .reduce((acc: Record<string, Lyric[]>, lyric) => {
+                const band = lyric.band?.trim() || 'Unknown Artist';
+                if (!acc[band]) acc[band] = [];
+                acc[band].push(lyric);
+                return acc;
+              }, {})
+          ).sort(([a], [b]) => {
+            const getSortable = (s: string) => s.toLowerCase().startsWith('the ') ? s.slice(4).trim() : s;
+            return getSortable(a).localeCompare(getSortable(b));
+          }).map(([band, bandLyrics]) => (
+            <div key={band} className="mb-4">
+              <h3 className="text-[16px] font-medium text-gray-900 mb-2">{band}</h3>
+              <div className="pl-[12px]">
+                {(bandLyrics as Lyric[]).sort((a, b) => a.song.localeCompare(b.song)).map((lyric) => (
+                  <div key={lyric.id} className="flex items-center group border-b border-gray-50 last:border-0">
+                    <div className="flex items-center space-x-2 flex-1 min-w-0 py-1" id={`song-${lyric.id}`}>
+                      {isAdmin && lyric.id !== 'default' && (
                         <button
-                          onClick={() => {
-                            setIsFadingOut(true);
-                            setTimeout(() => {
-                              setCurrentLyric(lyric);
-                              setActivePanel(null);
-                            }, 300);
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setLyricToDelete(lyric.id);
                           }}
-                          className="text-sm text-gray-500 hover:text-blue-600 transition-colors truncate text-left"
+                          className="text-gray-300 hover:text-red-500 transition-colors p-1 -ml-1"
+                          title="Delete lyric"
                         >
-                          {lyric.song}
+                          <X size={12} />
                         </button>
-                      </div>
+                      )}
+                      <button
+                        onClick={() => {
+                          setIsFadingOut(true);
+                          setTimeout(() => {
+                            setCurrentLyric(lyric);
+                            setActivePanel(null);
+                          }, 300);
+                        }}
+                        className="text-sm text-gray-500 hover:text-blue-600 transition-colors truncate text-left"
+                      >
+                        {lyric.song}
+                      </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            ))}
-            
-            {allLyrics.length === 0 && (
-              <p className="text-gray-400 text-sm italic">No lyrics found in the library.</p>
-            )}
-          </div>
+            </div>
+          ))}
+          
+          {allLyrics.length === 0 && (
+            <p className="text-gray-400 text-sm italic">No lyrics found in the library.</p>
+          )}
         </div>
       </SidePanel>
 

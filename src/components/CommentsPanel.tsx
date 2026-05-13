@@ -42,7 +42,7 @@ export default function CommentsPanel({
   };
 
   return (
-    <div className="px-8 flex flex-col h-full overflow-hidden">
+    <div className="px-8 bg-white min-h-full">
       {/* Action Header */}
       {currentUserId && (
         !isAdding ? (
@@ -86,7 +86,7 @@ export default function CommentsPanel({
 
 
       {/* List */}
-      <div className="flex-1 space-y-8 pb-10 overflow-y-auto custom-scrollbar">
+      <div className="space-y-8 pb-10">
         {comments.length === 0 ? (
           <p className="text-gray-400 text-sm italic">No comments yet. Be the first!</p>
         ) : (

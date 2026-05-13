@@ -74,7 +74,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
         // In most static setups, /api/.. will return <!doctype html>... causing the JSON error
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         
-        if (isLocalhost || window.location.hostname.includes('ais-dev-')) {
+        if (isLocalhost || window.location.hostname.includes('ais-dev-') || window.location.hostname.includes('ais-pre-')) {
           const res = await fetch(`/api/pexels/search?query=${encodeURIComponent(pexelsQuery)}&page=${page}`);
           
           if (res.headers.get('content-type')?.includes('text/html')) {
@@ -160,7 +160,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="px-8 pt-6 pb-10 space-y-8">
+      <form onSubmit={handleSubmit} className="px-8 pt-6 pb-10 space-y-8 bg-white min-h-full">
         <div className="space-y-1">
           <div className="flex items-center justify-between relative">
             <label className={labelClasses + " mb-0"}>Lyrics</label>
@@ -251,7 +251,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
 
           {pexelsResults.length > 0 && (
             <div className="space-y-2">
-              <div className="grid grid-cols-4 gap-2 max-h-[160px] overflow-y-auto p-1 custom-scrollbar">
+              <div className="grid grid-cols-4 gap-2 max-h-[160px] overflow-y-auto p-1">
                 {pexelsResults.map((photo) => (
                   <button
                     key={photo.id}
