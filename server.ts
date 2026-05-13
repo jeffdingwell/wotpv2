@@ -10,8 +10,6 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  const pexelsClient = createClient(process.env.PEXELS_API_KEY || '');
-
   app.use(express.json());
 
   // API Route for Pexels Search
@@ -22,16 +20,20 @@ async function startServer() {
       return res.status(400).json({ error: 'Query parameter is required' });
     }
 
+    // Try both standard and Vite-prefixed keys for flexibility
+    const apiKey = process.env.PEXELS_API_KEY || process.env.VITE_PEXELS_API_KEY;
+
     try {
-      if (!process.env.PEXELS_API_KEY) {
-        return res.status(500).json({ error: 'Pexels API key not configured' });
+      if (!apiKey || apiKey === 'YOUR_PEXELS_API_KEY') {
+        return res.status(500).json({ error: 'Pexels API key not configured on server. Please set PEXELS_API_KEY in project secrets.' });
       }
       
-      const response = await pexelsClient.photos.search({ query, per_page: 8, page });
+      const client = createClient(apiKey);
+      const response = await client.photos.search({ query, per_page: 8, page });
       res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Pexels API error:', error);
-      res.status(500).json({ error: 'Failed to fetch images from Pexels' });
+      res.status(500).json({ error: error.message || 'Failed to fetch images from Pexels' });
     }
   });
 

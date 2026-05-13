@@ -60,7 +60,7 @@ export default function CommentsPanel({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add your message"
-              className="w-full border border-gray-200 p-4 min-h-[120px] outline-none focus:border-blue-500 text-sm placeholder:text-gray-400"
+              className="w-full border border-gray-200 p-4 min-h-[120px] outline-none focus:border-blue-500 text-base placeholder:text-gray-400"
             />
             <div className="flex items-center space-x-6">
               <button
