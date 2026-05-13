@@ -20,8 +20,10 @@ async function startServer() {
       return res.status(400).json({ error: 'Query parameter is required' });
     }
 
-    // Try both standard and Vite-prefixed keys for flexibility
-    const apiKey = process.env.PEXELS_API_KEY || process.env.VITE_PEXELS_API_KEY;
+    // Try both standard and Vite-prefixed keys for flexibility, with a hardcoded fallback as requested
+    const apiKey = process.env.PEXELS_API_KEY || 
+                   process.env.VITE_PEXELS_API_KEY || 
+                   'HakLnJ24mzkfPjZtUj1Xp0yQa5YTitIGAV5IfkmgO6TtPMgX5lwBMfAc';
 
     try {
       if (!apiKey || apiKey === 'YOUR_PEXELS_API_KEY') {
