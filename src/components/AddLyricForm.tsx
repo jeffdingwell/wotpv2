@@ -30,6 +30,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
   const [pexelsPage, setPexelsPage] = useState(1);
   const [isSearching, setIsSearching] = useState(false);
   const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+  const [selectedPreviewPhoto, setSelectedPreviewPhoto] = useState<any | null>(null);
   const [showRules, setShowRules] = useState(false);
 
   useEffect(() => {
@@ -249,7 +250,13 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
                   <button
                     key={photo.id}
                     type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, imageUrl: photo.src.large2x }))}
+                    onClick={() => {
+                      if (window.innerWidth < 1024) {
+                        setSelectedPreviewPhoto(photo);
+                      } else {
+                        setFormData(prev => ({ ...prev, imageUrl: photo.src.large2x }));
+                      }
+                    }}
                     onMouseEnter={() => setHoveredImage(photo.src.large)}
                     onMouseLeave={() => setHoveredImage(null)}
                     className={`relative group aspect-square rounded overflow-hidden border-2 transition-all ${
@@ -375,7 +382,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
       </form>
 
       {/* Global Preview Overlay - Positioned 16px left of the side sheet on desktop */}
-      {hoveredImage && createPortal(
+      {hoveredImage && !selectedPreviewPhoto && createPortal(
         <AnimatePresence mode="wait">
           <motion.div
             key={hoveredImage}
@@ -393,25 +400,58 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
               />
             </div>
           </motion.div>
+        </AnimatePresence>,
+        document.body
+      )}
 
-          {/* Mobile version - centered */}
+      {/* Mobile Detailed Preview with Actions */}
+      {selectedPreviewPhoto && createPortal(
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center px-6 lg:hidden">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelectedPreviewPhoto(null)}
+          />
           <motion.div
-            key={`mobile-${hoveredImage}`}
-            initial={{ opacity: 0, scale: 0.9, x: '-50%', y: '-50%' }}
-            animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
-            exit={{ opacity: 0, scale: 0.9, x: '-50%', y: '-50%' }}
-            className="fixed top-1/2 left-1/2 z-[9999] pointer-events-none lg:hidden"
-            style={{ width: 'min(400px, 80vw)' }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="relative bg-white w-full max-w-[400px] rounded-lg shadow-2xl overflow-hidden"
           >
-            <div className="bg-black/80 backdrop-blur-md p-2 rounded-lg shadow-2xl overflow-hidden border border-white/10">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h4 className="text-xs uppercase tracking-widest font-bold text-gray-400">Preview</h4>
+              <button onClick={() => setSelectedPreviewPhoto(null)} className="text-gray-400 hover:text-black">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="aspect-[4/3] w-full overflow-hidden">
               <img 
-                src={hoveredImage} 
-                alt="Preview" 
-                className="w-full h-auto rounded"
+                src={selectedPreviewPhoto.src.large} 
+                alt={selectedPreviewPhoto.alt}
+                className="w-full h-full object-cover"
               />
             </div>
+            <div className="p-6 space-y-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, imageUrl: selectedPreviewPhoto.src.large2x }));
+                  setSelectedPreviewPhoto(null);
+                }}
+                className="w-full bg-[#24459c] text-white py-3 rounded-md text-sm font-semibold hover:bg-blue-800 transition-colors shadow-lg active:scale-[0.98]"
+              >
+                Use this image
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPreviewPhoto(null)}
+                className="w-full bg-gray-100 text-gray-700 py-3 rounded-md text-sm font-semibold hover:bg-gray-200 transition-colors active:scale-[0.98]"
+              >
+                Cancel
+              </button>
+            </div>
           </motion.div>
-        </AnimatePresence>,
+        </div>,
         document.body
       )}
     </>

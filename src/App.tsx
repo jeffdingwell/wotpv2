@@ -260,6 +260,27 @@ export default function App() {
     }
   };
 
+  const navigateLyric = (direction: 'prev' | 'next') => {
+    if (allLyrics.length <= 1) {
+      if (direction === 'next') refreshLyrics();
+      return;
+    }
+    
+    const currentIndex = allLyrics.findIndex(l => l.id === currentLyric?.id);
+    let nextIndex;
+    
+    if (direction === 'prev') {
+      nextIndex = currentIndex <= 0 ? allLyrics.length - 1 : currentIndex - 1;
+    } else {
+      nextIndex = currentIndex >= allLyrics.length - 1 ? 0 : currentIndex + 1;
+    }
+    
+    setIsFadingOut(true);
+    setTimeout(() => {
+      setCurrentLyric(allLyrics[nextIndex]);
+    }, 300);
+  };
+
   const isAdmin = user?.email === 'jeff@bolddesign.ca';
   const isOwner = currentLyric?.id !== 'default' && currentLyric?.userId === user?.uid;
   const canEditCurrent = isOwner;
@@ -287,7 +308,25 @@ export default function App() {
         isPaused={activePanel !== null || isHoveringHero}
       />
 
-      <main>
+      <motion.main 
+        className="flex-1 relative"
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={(_, info) => {
+          // Only trigger on mobile/small screens
+          if (window.innerWidth >= 1024) return;
+          
+          const threshold = 100;
+          if (info.offset.x > threshold) {
+            // Swipe Right -> New screen
+            navigateLyric('next');
+          } else if (info.offset.x < -threshold) {
+            // Swipe Left -> Previous screen
+            navigateLyric('prev');
+          }
+        }}
+      >
         <Hero 
           lyric={currentLyric} 
           isFadingOut={isFadingOut}
@@ -301,7 +340,7 @@ export default function App() {
           onShowComments={() => setActivePanel(activePanel === 'comments' ? null : 'comments')}
           commentCount={comments.length}
         />
-      </main>
+      </motion.main>
 
       {/* Side Sheets */}
       <SidePanel 
