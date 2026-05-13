@@ -38,6 +38,7 @@ export default function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [isHoveringHero, setIsHoveringHero] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isIntroActive, setIsIntroActive] = useState(false);
   const [lyricToDelete, setLyricToDelete] = useState<string | null>(null);
 
   // Default lyric if database is empty
@@ -63,7 +64,7 @@ export default function App() {
     // Initial Lyrics load - Pick a random one from recent entries, but check for Jeff's card first
     const fetchRandomLyric = async () => {
       try {
-        const hasSeenIntro = sessionStorage.getItem('hasSeenIntro_v5');
+        const hasSeenIntro = sessionStorage.getItem('hasSeenIntro_v6');
         
         if (!hasSeenIntro) {
           // If haven't seen intro, specifically look for Jeff's card
@@ -72,7 +73,7 @@ export default function App() {
           if (!jeffSnapshot.empty) {
             const jeffsCard = { id: jeffSnapshot.docs[0].id, ...jeffSnapshot.docs[0].data() } as Lyric;
             setCurrentLyric(jeffsCard);
-            sessionStorage.setItem('hasSeenIntro_v5', 'true');
+            setIsIntroActive(true);
             return;
           }
         }
@@ -121,6 +122,7 @@ export default function App() {
 
   const refreshLyrics = async () => {
     try {
+      setIsIntroActive(false);
       const qLyrics = query(collection(db, 'lyrics'), orderBy('createdAt', 'desc'), limit(50));
       const snapshot = await getDocs(qLyrics);
       const fetchedLyrics = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lyric));
@@ -168,6 +170,12 @@ export default function App() {
 
     return () => unsubscribeComments();
   }, [currentLyric?.id]);
+
+  const handleStartApp = () => {
+    sessionStorage.setItem('hasSeenIntro_v6', 'true');
+    setIsIntroActive(false);
+    refreshLyrics();
+  };
 
   const handleSaveLyric = async (formData: Omit<Lyric, 'id' | 'createdAt'>, id?: string) => {
     if (!user) {
@@ -306,7 +314,7 @@ export default function App() {
         onComplete={refreshLyrics}
         onNearComplete={() => setIsFadingOut(true)}
         keyTrigger={currentLyric?.id || 'empty'}
-        isPaused={activePanel !== null || isHoveringHero}
+        isPaused={activePanel !== null || isHoveringHero || isIntroActive}
       />
 
       <motion.main 
@@ -332,6 +340,8 @@ export default function App() {
           lyric={currentLyric} 
           isFadingOut={isFadingOut}
           canEdit={canEditCurrent}
+          isIntroActive={isIntroActive}
+          onStart={handleStartApp}
           onEdit={() => {
             setIsEditing(true);
             setActivePanel('add-lyric');

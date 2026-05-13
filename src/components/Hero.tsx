@@ -11,9 +11,22 @@ interface HeroProps {
   onMouseLeave?: () => void;
   onShowComments: () => void;
   commentCount: number;
+  isIntroActive?: boolean;
+  onStart?: () => void;
 }
 
-export default function Hero({ lyric, isFadingOut, onEdit, canEdit, onMouseEnter, onMouseLeave, onShowComments, commentCount }: HeroProps) {
+export default function Hero({ 
+  lyric, 
+  isFadingOut, 
+  onEdit, 
+  canEdit, 
+  onMouseEnter, 
+  onMouseLeave, 
+  onShowComments, 
+  commentCount,
+  isIntroActive,
+  onStart
+}: HeroProps) {
   if (!lyric) return null;
 
   const isJeffsCard = lyric.band?.trim().toLowerCase() === 'jeff dingwell';
@@ -75,15 +88,24 @@ export default function Hero({ lyric, isFadingOut, onEdit, canEdit, onMouseEnter
               ))}
             </blockquote>
             
-            <div className="mb-4">
-              {!isJeffsCard && (
-                <h2 className="text-[11px] min-[480px]:text-sm font-semibold tracking-[0.2em] text-white uppercase mb-1">
-                  {lyric.song}
-                </h2>
-              )}
-              <p className="text-[12.5px] min-[480px]:text-[15px] text-gray-400 tracking-wider mb-2">
+            {!isJeffsCard && (
+              <h2 className="text-[11px] min-[480px]:text-sm font-semibold tracking-[0.2em] text-white uppercase mb-1">
+                {lyric.song}
+              </h2>
+            )}
+
+            <div className={`flex items-center justify-between mt-2 pt-2 ${isJeffsCard && isIntroActive ? 'mb-4' : 'mb-6'}`}>
+              <p className="text-[12.5px] min-[480px]:text-[15px] text-gray-400 tracking-wider">
                 {isJeffsCard ? 'Enjoy' : lyric.band}
               </p>
+              {isJeffsCard && isIntroActive && onStart && (
+                <button
+                  onClick={onStart}
+                  className="bg-blue-600 text-white px-3 py-1 text-[12.5px] min-[480px]:text-[15px] tracking-wider uppercase hover:bg-blue-700 transition-colors rounded-sm"
+                >
+                  GET STARTED
+                </button>
+              )}
             </div>
 
             {!isJeffsCard && (
