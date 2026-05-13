@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, Loader2, Check, Trash2, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Loader2, Check, Trash2, ShieldAlert, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Lyric } from '../types';
 import { User } from 'firebase/auth';
@@ -29,6 +29,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
   const [pexelsResults, setPexelsResults] = useState<any[]>([]);
   const [pexelsPage, setPexelsPage] = useState(1);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [hoveredImage, setHoveredImage] = useState<string | null>(null);
   const [selectedPreviewPhoto, setSelectedPreviewPhoto] = useState<any | null>(null);
   const [showRules, setShowRules] = useState(false);
@@ -50,6 +51,7 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
   const handleSearchImages = async (page = 1) => {
     if (!pexelsQuery.trim()) return;
     setIsSearching(true);
+    setSearchError(null);
     try {
       const apiKey = import.meta.env.VITE_PEXELS_API_KEY;
       
@@ -84,8 +86,9 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
         
         throw new Error('Pexels API key missing or proxy failed. Please set VITE_PEXELS_API_KEY for production.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to search pexels:', error);
+      setSearchError(error?.message || 'Failed to search images');
     } finally {
       setIsSearching(false);
     }
@@ -243,7 +246,19 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
             </div>
           </div>
 
-          {pexelsResults.length > 0 && (
+          {isSearching && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="animate-spin text-[#24459c]" size={24} />
+            </div>
+          )}
+
+          {searchError && (
+            <div className="p-3 bg-red-50 text-red-600 text-xs rounded border border-red-100">
+              {searchError}
+            </div>
+          )}
+
+          {pexelsResults.length > 0 ? (
             <div className="space-y-2">
               <div className="grid grid-cols-4 gap-2 max-h-[160px] overflow-y-auto p-1">
                 {pexelsResults.map((photo) => (
@@ -276,31 +291,31 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
                   </button>
                 ))}
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  {pexelsPage > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleSearchImages(pexelsPage - 1)}
-                      disabled={isSearching}
-                      className="text-[10px] text-blue-600 hover:text-blue-800 uppercase tracking-wider font-semibold transition-colors flex items-center"
-                    >
-                      <ChevronLeft size={12} className="mr-1" />
-                      Back
-                    </button>
-                  )}
+              <div className="flex justify-between items-center px-1">
+                <p className="text-[10px] text-gray-400 font-medium italic">Photos from Pexels</p>
+                <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => handleSearchImages(pexelsPage + 1)}
-                    disabled={isSearching}
-                    className="text-[10px] text-blue-600 hover:text-blue-800 uppercase tracking-wider font-semibold transition-colors flex items-center"
+                    disabled={pexelsPage <= 1 || isSearching}
+                    onClick={() => handleSearchImages(pexelsPage - 1)}
+                    className="p-1 hover:bg-gray-100 rounded disabled:opacity-30"
                   >
-                    {pexelsPage > 1 ? 'Next' : 'Find more images'}
-                    <ChevronRight size={12} className="ml-1" />
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSearching}
+                    onClick={() => handleSearchImages(pexelsPage + 1)}
+                    className="p-1 hover:bg-gray-100 rounded disabled:opacity-30"
+                  >
+                    <ChevronRight size={16} />
                   </button>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">Page {pexelsPage}</span>
               </div>
+            </div>
+          ) : !isSearching && pexelsQuery && (
+            <div className="text-center py-8 text-gray-400 text-xs italic">
+              No results found for "{pexelsQuery}"
             </div>
           )}
 

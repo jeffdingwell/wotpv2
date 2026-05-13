@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { 
   collection, 
   query, 
@@ -286,7 +287,7 @@ export default function App() {
   const canEditCurrent = isOwner;
 
   return (
-    <div className="h-screen bg-black overflow-hidden font-sans">
+    <div className="flex flex-col h-screen bg-black overflow-hidden font-sans">
       <Header 
         user={user}
         onAddNew={() => {
