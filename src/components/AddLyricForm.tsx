@@ -53,45 +53,30 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
     setIsSearching(true);
     setSearchError(null);
     try {
-      const apiKey = import.meta.env.VITE_PEXELS_API_KEY;
+      // Always use the server-side proxy to keep API keys secure and centralized
+      const res = await fetch(`/api/pexels/search?query=${encodeURIComponent(pexelsQuery)}&page=${page}`);
       
-      if (apiKey && apiKey !== 'YOUR_PEXELS_API_KEY') {
-        const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(pexelsQuery)}&per_page=8&page=${page}`, {
-          headers: {
-            Authorization: apiKey
-          }
-        });
-        
-        if (!res.ok) throw new Error(`Pexels API responded with status: ${res.status}`);
-        const data = await res.json();
-        if (data.photos) {
-          setPexelsResults(data.photos);
-          setPexelsPage(page);
+      const contentType = res.headers.get('content-type');
+      const isJson = contentType && contentType.includes('application/json');
+      
+      if (!res.ok) {
+        if (isJson) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || `Server responded with status: ${res.status}`);
         }
+        throw new Error(`Server responded with status: ${res.status}`);
+      }
+
+      if (!isJson) {
+        throw new Error('Server returned non-JSON response');
+      }
+
+      const data = await res.json();
+      if (data.photos && Array.isArray(data.photos)) {
+        setPexelsResults(data.photos);
+        setPexelsPage(page);
       } else {
-        // Always try the proxy as a fallback
-        const res = await fetch(`/api/pexels/search?query=${encodeURIComponent(pexelsQuery)}&page=${page}`);
-        
-        if (res.ok) {
-          const contentType = res.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
-            const data = await res.json();
-            if (data.photos) {
-              setPexelsResults(data.photos);
-              setPexelsPage(page);
-              return;
-            }
-          }
-        } else {
-          try {
-            const errorData = await res.json();
-            if (errorData.error) throw new Error(errorData.error);
-          } catch (e: any) {
-            if (e.message) throw e;
-          }
-        }
-        
-        throw new Error('Pexels API key missing or proxy failed. Please set PEXELS_API_KEY in your project secrets.');
+        throw new Error('Invalid response format from server');
       }
     } catch (error: any) {
       console.error('Failed to search pexels:', error);

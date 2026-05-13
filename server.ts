@@ -20,22 +20,33 @@ async function startServer() {
       return res.status(400).json({ error: 'Query parameter is required' });
     }
 
-    // Try both standard and Vite-prefixed keys for flexibility, with a hardcoded fallback as requested
-    const apiKey = process.env.PEXELS_API_KEY || 
-                   process.env.VITE_PEXELS_API_KEY || 
-                   'HakLnJ24mzkfPjZtUj1Xp0yQa5YTitIGAV5IfkmgO6TtPMgX5lwBMfAc';
+    // Try both standard and Vite-prefixed keys for flexibility, with a hardcoded fallback as requested.
+    // We filter out placeholders like "YOUR_PEXELS_API_KEY"
+    const candidates = [
+      process.env.PEXELS_API_KEY,
+      process.env.VITE_PEXELS_API_KEY,
+      'HakLnJ24mzkfPjZtUj1Xp0yQa5YTitIGAV5IfkmgO6TtPMgX5lwBMfAc' // Hardcoded fallback provided by user
+    ];
+    
+    const apiKey = candidates.find(key => key && key !== 'YOUR_PEXELS_API_KEY');
 
     try {
-      if (!apiKey || apiKey === 'YOUR_PEXELS_API_KEY') {
-        return res.status(500).json({ error: 'Pexels API key not configured on server. Please set PEXELS_API_KEY in project secrets.' });
+      if (!apiKey) {
+        return res.status(500).json({ error: 'Pexels API key not configured on server. Please ensure PEXELS_API_KEY is set in project secrets.' });
       }
       
       const client = createClient(apiKey);
       const response = await client.photos.search({ query, per_page: 8, page });
+      
+      if (!response) {
+        throw new Error('Pexels API returned empty response');
+      }
+      
       res.json(response);
     } catch (error: any) {
       console.error('Pexels API error:', error);
-      res.status(500).json({ error: error.message || 'Failed to fetch images from Pexels' });
+      const message = error.message || 'Failed to fetch images from Pexels';
+      res.status(500).json({ error: message });
     }
   });
 
