@@ -56,7 +56,7 @@ export default function Hero({
           <div 
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            className="w-full bg-black/40 backdrop-blur-sm pt-12 px-4 pb-4 min-[480px]:pt-12 min-[480px]:px-12 min-[480px]:pb-12 text-left md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 group"
+            className={`w-full bg-black/40 backdrop-blur-sm ${isJeffsCard ? 'pt-[88px]' : 'pt-[72px]'} px-4 pb-4 min-[480px]:pt-[72px] min-[480px]:px-12 min-[480px]:pb-12 text-left md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 group`}
           >
             <blockquote className={`${isJeffsCard ? 'space-y-4 min-[480px]:space-y-6' : 'space-y-1 min-[480px]:space-y-2'} mb-6 min-[480px]:mb-10`}>
               {lyric.text.split('\n').map((line, i) => (
