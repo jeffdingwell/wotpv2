@@ -56,7 +56,7 @@ export default function Hero({
           <div 
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            className="w-full bg-black/40 backdrop-blur-sm p-4 min-[480px]:p-12 text-left md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 group"
+            className="w-full bg-black/40 backdrop-blur-sm pt-12 px-4 pb-4 min-[480px]:pt-12 min-[480px]:px-12 min-[480px]:pb-12 text-left md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 group"
           >
             <blockquote className={`${isJeffsCard ? 'space-y-4 min-[480px]:space-y-6' : 'space-y-1 min-[480px]:space-y-2'} mb-6 min-[480px]:mb-10`}>
               {lyric.text.split('\n').map((line, i) => (
@@ -80,8 +80,8 @@ export default function Hero({
               </h2>
             )}
 
-            <div className={`flex items-center justify-between mt-2 pt-2 ${isJeffsCard && isIntroActive ? 'mb-4' : 'mb-6'}`}>
-              <p className="text-[14.5px] min-[480px]:text-[15px] text-gray-400 tracking-wider">
+            <div className={`flex items-center justify-between mt-0 pt-0 ${isJeffsCard && isIntroActive ? 'mb-4' : 'mb-6'}`}>
+              <p className="text-[14.5px] min-[480px]:text-[15px] text-gray-300 tracking-wider">
                 {isJeffsCard ? 'Enjoy' : lyric.band}
               </p>
               {isJeffsCard && isIntroActive && onStart && (
