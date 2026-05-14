@@ -51,7 +51,7 @@ export default function Hero({
             duration: 0.8, 
             ease: [0.21, 0.45, 0.32, 0.9] 
           }}
-          className="relative z-10 w-full max-w-xl mx-4 -translate-y-16 min-[480px]:translate-y-0"
+          className="relative z-10 w-full max-w-xl mx-4 -translate-y-[114px] min-[480px]:translate-y-0"
         >
           <div 
             onMouseEnter={onMouseEnter}
