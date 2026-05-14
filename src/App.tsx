@@ -106,7 +106,9 @@ export default function App() {
     // Listen to all lyrics for Search
     const qAllLyrics = query(collection(db, 'lyrics'), orderBy('band', 'asc'));
     const unsubscribeAllLyrics = onSnapshot(qAllLyrics, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lyric));
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Lyric))
+        .filter(l => l.band?.trim().toLowerCase() !== 'jeff dingwell');
       setAllLyrics(data);
     }, (error) => handleFirestoreError(error, OperationType.LIST, 'lyrics'));
 
