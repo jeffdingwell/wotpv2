@@ -187,9 +187,16 @@ export default function AddLyricForm({ onSave, onDelete, onCancel, initialData, 
                   exit={{ opacity: 0, y: 5 }}
                   className="absolute top-full left-[-32px] right-[-32px] z-50 mt-3 pointer-events-none px-4"
                 >
-                  <div className="bg-white p-6 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-gray-100 rounded-sm">
-                    <p className="text-[13px] leading-relaxed text-gray-700 font-normal">
+                  <div className="bg-white p-6 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-gray-100 rounded-sm max-w-sm">
+                    <p className="text-[13px] leading-relaxed text-gray-700 font-normal mb-4">
                       This is not a democracy—it’s a dictatorship. Zero tolerance. Post lyrics and nothing else. Any racial, political, homophobic, disrespectful, or otherwise dumb shit gets you banned. No warnings. No second chances.
+                    </p>
+                    <p className="text-[13px] leading-relaxed text-gray-700 font-normal">
+                      Add a few lines from a song that are meaningful to you. Include the song title and the band/artist name. 
+                      <br /><br />
+                      Enter some text to describe what you think would be appropriate background image and hit search. Pick a thumbnail or user the arrows to see others.
+                      <br /><br />
+                      If you want you can also include a link to play the song in Youtube, Spotify or Apple Music.
                     </p>
                   </div>
                 </motion.div>

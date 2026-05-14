@@ -51,7 +51,7 @@ export default function Hero({
             duration: 0.8, 
             ease: [0.21, 0.45, 0.32, 0.9] 
           }}
-          className="relative z-10 w-full max-w-xl mx-4 min-[480px]:translate-y-0"
+          className="relative z-10 w-full max-w-xl mx-4 -translate-y-16 min-[480px]:translate-y-0"
         >
           <div 
             onMouseEnter={onMouseEnter}
@@ -64,8 +64,8 @@ export default function Hero({
                   key={i}
                   className={`${
                     isJeffsCard 
-                      ? 'text-[20px] md:text-[22.5px] leading-[28.5px]' 
-                      : 'text-[20px] min-[480px]:text-2xl md:text-3xl leading-tight'
+                      ? 'text-[24px] md:text-[22.5px] leading-[32px]' 
+                      : 'text-[24px] min-[480px]:text-2xl md:text-3xl leading-tight'
                   } font-serif text-gray-100`}
                 >
                   {line}
@@ -75,19 +75,19 @@ export default function Hero({
             
             
             {!isJeffsCard && (
-              <h2 className="text-[11px] min-[480px]:text-sm font-semibold tracking-[0.2em] text-white uppercase mb-1">
+              <h2 className="text-[13px] min-[480px]:text-sm font-semibold tracking-[0.2em] text-white uppercase mb-1">
                 {lyric.song}
               </h2>
             )}
 
             <div className={`flex items-center justify-between mt-2 pt-2 ${isJeffsCard && isIntroActive ? 'mb-4' : 'mb-6'}`}>
-              <p className="text-[12.5px] min-[480px]:text-[15px] text-gray-400 tracking-wider">
+              <p className="text-[14.5px] min-[480px]:text-[15px] text-gray-400 tracking-wider">
                 {isJeffsCard ? 'Enjoy' : lyric.band}
               </p>
               {isJeffsCard && isIntroActive && onStart && (
                 <button
                   onClick={onStart}
-                  className="bg-blue-600 text-white px-3 py-1 text-[12.5px] min-[480px]:text-[15px] tracking-wider uppercase hover:bg-blue-700 transition-colors rounded-sm"
+                  className="bg-blue-600 text-white px-3 py-1 text-[14.5px] min-[480px]:text-[15px] tracking-wider uppercase hover:bg-blue-700 transition-colors rounded-sm"
                 >
                   GET STARTED
                 </button>
@@ -136,14 +136,14 @@ export default function Hero({
                   {canEdit && onEdit && (
                     <button 
                       onClick={onEdit}
-                      className="text-sm text-gray-400 hover:text-white transition-colors mr-[16px]"
+                      className="text-[16px] min-[480px]:text-sm text-gray-400 hover:text-white transition-colors mr-[16px]"
                     >
                       Edit
                     </button>
                   )}
                   <button 
                     onClick={onShowComments}
-                    className="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors relative"
+                    className="flex items-center space-x-2 text-[16px] min-[480px]:text-sm text-gray-300 hover:text-white transition-colors relative"
                   >
                     <MessageSquare size={18} />
                     <span className="hidden min-[480px]:inline">Comments</span>
