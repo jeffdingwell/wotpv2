@@ -33,21 +33,6 @@ export default function Hero({
 
   return (
     <div className="relative flex items-center justify-center h-full w-full overflow-hidden">
-      {/* Background with overlay */}
-      <AnimatePresence mode="wait">
-        <motion.div 
-          key={`bg-${lyric.id}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6 }}
-          className="fixed inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${lyric.imageUrl})` }}
-        >
-          <div className="absolute inset-0 bg-black/30" />
-        </motion.div>
-      </AnimatePresence>
-
       {/* Lyric Card */}
       <AnimatePresence mode="wait">
         <motion.div 
@@ -66,12 +51,12 @@ export default function Hero({
             duration: 0.8, 
             ease: [0.21, 0.45, 0.32, 0.9] 
           }}
-          className="relative z-10 w-full max-w-xl mx-4 -translate-y-[100px] min-[480px]:translate-y-0"
+          className="relative z-10 w-full max-w-xl mx-4 min-[480px]:translate-y-0"
         >
           <div 
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            className="w-full bg-black/60 backdrop-blur-sm p-4 min-[480px]:p-12 text-center md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 group"
+            className="w-full bg-black/40 backdrop-blur-sm p-4 min-[480px]:p-12 text-left md:text-left border border-white/5 shadow-2xl transition-transform hover:scale-[1.01] active:scale-100 group"
           >
             <blockquote className={`${isJeffsCard ? 'space-y-4 min-[480px]:space-y-6' : 'space-y-1 min-[480px]:space-y-2'} mb-6 min-[480px]:mb-10`}>
               {lyric.text.split('\n').map((line, i) => (
@@ -79,14 +64,15 @@ export default function Hero({
                   key={i}
                   className={`${
                     isJeffsCard 
-                      ? 'text-[14px] min-[480px]:text-[18px] md:text-[22.5px] leading-[28.5px]' 
-                      : 'text-[19px] min-[480px]:text-2xl md:text-3xl leading-tight'
+                      ? 'text-[20px] md:text-[22.5px] leading-[28.5px]' 
+                      : 'text-[20px] min-[480px]:text-2xl md:text-3xl leading-tight'
                   } font-serif text-gray-100`}
                 >
                   {line}
                 </p>
               ))}
             </blockquote>
+            
             
             {!isJeffsCard && (
               <h2 className="text-[11px] min-[480px]:text-sm font-semibold tracking-[0.2em] text-white uppercase mb-1">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   collection, 
   query, 
@@ -64,7 +64,7 @@ export default function App() {
     // Initial Lyrics load - Pick a random one from recent entries, but check for Jeff's card first
     const fetchRandomLyric = async () => {
       try {
-        const hasSeenIntro = sessionStorage.getItem('hasSeenIntro_v6');
+        const hasSeenIntro = sessionStorage.getItem('hasSeenIntro_v7');
         
         if (!hasSeenIntro) {
           // If haven't seen intro, specifically look for Jeff's card
@@ -172,7 +172,7 @@ export default function App() {
   }, [currentLyric?.id]);
 
   const handleStartApp = () => {
-    sessionStorage.setItem('hasSeenIntro_v6', 'true');
+    sessionStorage.setItem('hasSeenIntro_v7', 'true');
     setIsIntroActive(false);
     refreshLyrics();
   };
@@ -296,6 +296,23 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen bg-black overflow-hidden font-sans">
+      {/* Global Background */}
+      <AnimatePresence mode="wait">
+        {currentLyric && (
+          <motion.div 
+            key={`bg-${currentLyric.id}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className="fixed inset-0 bg-cover bg-center pointer-events-none"
+            style={{ backgroundImage: `url(${currentLyric.imageUrl})` }}
+          >
+            <div className="absolute inset-0 bg-black/25" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Header 
         user={user}
         onAddNew={() => {
@@ -318,7 +335,7 @@ export default function App() {
       />
 
       <motion.main 
-        className="flex-1 relative"
+        className="flex-1 relative pt-[80px] min-[480px]:pt-0"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.2}
