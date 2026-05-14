@@ -297,7 +297,7 @@ export default function App() {
   const canEditCurrent = isOwner;
 
   return (
-    <div className="flex flex-col h-screen bg-black overflow-hidden font-sans">
+    <div className="flex flex-col h-screen bg-black overflow-x-hidden overflow-y-auto font-sans">
       {/* Global Background */}
       <AnimatePresence mode="wait">
         {currentLyric && (

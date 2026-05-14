@@ -32,7 +32,7 @@ export default function Hero({
   const isJeffsCard = lyric.band?.trim().toLowerCase() === 'jeff dingwell';
 
   return (
-    <div className="relative flex items-center justify-center h-full w-full overflow-hidden">
+    <div className={`relative flex ${isJeffsCard ? 'items-start pt-2' : 'items-center'} min-[480px]:items-center min-[480px]:pt-0 justify-center h-full w-full overflow-visible`}>
       {/* Lyric Card */}
       <AnimatePresence mode="wait">
         <motion.div 
